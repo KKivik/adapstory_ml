@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная страница | Мой Сайт{% endblock %}
+
+{% block content %}
+<main class="container mt-5">
+    <section class="jumbotron text-center">
+        <h1 class="display-4">Добро пожаловать под капот AdapStory!</h1>
+        <p class="lead">Здесь происходит закрытое тестирование сервисов.</p>
+        <hr class="my-4">
+        <p>Используйте кнопку ниже, чтобы начать работу.</p>
+        <a class="btn btn-primary btn-lg" href="/login" role="button">Начать</a>
+    </section>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">ML_service</h5>
+                    <p class="card-text">Модель бинарной классификации комментриев на хорошие и плохие.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
