@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4 fw-bold text-primary">Записи в блоге</h1>
+        {% if current_user.is_authenticated %}
+            <a href="news" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-lg me-2"></i>Добавить новость
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        {% for item in news %}
+        <div class="col-12">
+            <div class="card shadow-sm border-0 hover-shadow-lg transition-all">
+                <div class="card-body">
+                    {% if item.is_private %}
+                    <span class="badge bg-warning text-dark mb-3">
+                        <i class="bi bi-lock-fill me-1"></i>Приватная запись
+                    </span>
+                    {% endif %}
+
+                    <h2 class="card-title mb-3 fw-bold text-gradient">
+                        {{ item.title }}
+                    </h2>
+
+                    <div class="card-text mb-4 text-muted lead">
+                        {{ item.content }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="bi bi-person-circle me-1"></i>{{ item.user.name }}
+                            <span class="mx-2">•</span>
+                            <i class="bi bi-clock me-1"></i>
+                            {{ item.created_date.strftime('%d %b %Y в %H:%M') }}
+                        </div>
+
+                        {% if current_user.is_authenticated and current_user == item.user %}
+                        <div class="btn-group">
+                            <a href="/news/{{ item.id }}" class="btn btn-outline-warning btn-sm rounded-pill">
+                                <i class="bi bi-pencil-square me-2"></i>Изменить
+                            </a>
+                            <a href="/news_delete/{{ item.id }}" class="btn btn-outline-danger btn-sm rounded-pill ms-2">
+                                <i class="bi bi-trash3 me-2"></i>Удалить
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="card border-dashed">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-newspaper display-1 text-muted mb-4"></i>
+                    <h3 class="text-muted mb-3">Пока что нет записей</h3>
+                    <p class="text-muted">Будьте первым, кто поделится своей новостью!</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(45deg, #0d6efd, #00b4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hover-shadow-lg {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hover-shadow-lg:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.1)!important;
+    }
+    .border-dashed {
+        border: 2px dashed #dee2e6;
+        border-radius: 1rem;
+    }
+</style>
+{% endblock %}

@@ -9,7 +9,16 @@
         <p class="lead">Здесь происходит закрытое тестирование сервисов.</p>
         <hr class="my-4">
         <p>Используйте кнопку ниже, чтобы начать работу.</p>
-        <a class="btn btn-primary btn-lg" href="/login" role="button">Начать</a>
+        {% if current_user.is_authenticated %}
+                <div>
+                    <a class="btn btn-primary btn-lg" href="/main" role="button">Начать</a>
+                </div>
+        {% else %}
+               <div>
+                    <a class="btn btn-primary btn-lg" href="/login" role="button">Начать</a>
+               </div>
+        {% endif %}
+
     </section>
 
     <div class="row mt-5">
