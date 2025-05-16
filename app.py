@@ -1,20 +1,22 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from sqlalchemy.sql.functions import current_user
 
 from data import db_session
 from forms.user import RegisterForm
 from forms.news import NewsForm
+from forms.ml import MLForm
 from data.users import User
 from data.news import News
 from flask import redirect, make_response, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_login import current_user
 from forms.user import LoginForm
-
+from ML.classification_comments.classification_comments import ML_classification_comments
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+analyzer = ML_classification_comments
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -69,7 +71,19 @@ def first_page():
 def main_page():
     db_sess = db_session.create_session()
     news = db_sess.query(News).filter((News.is_private != True) | ((News.is_private == True) & (News.user_id == current_user.id)))
-    return render_template("index3.html", news=news)
+    # Создаем форму для ML
+    ml_form = MLForm()
+    result = None
+
+    # Обрабатываем отправку формы
+    if ml_form.validate_on_submit():
+        text = ml_form.text.data
+        model_type = ml_form.model_type.data
+        # Вызываем ML-модель
+        result = analyzer.predict(text)
+
+    return render_template("index3.html", news=news, ml_form=ml_form)
+
 
 @app.route('/logout')
 @login_required
@@ -127,6 +141,8 @@ def edit_news(id):
                            form=form
                            )
 
+
+
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def news_delete(id):
@@ -138,6 +154,7 @@ def news_delete(id):
     else:
         abort(404)
     return redirect('/main')
+
 
 
 def main():

@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
 <div class="container-fluid py-4">
     <div class="row g-4">
         <!-- Блок ML-сервиса -->
@@ -12,34 +14,52 @@
                         Анализ текста
                     </h3>
 
-                    <form id="ml-request-form">
+                    <form method="POST">
+                        {{ ml_form.hidden_tag() }}
+
                         <div class="mb-3">
-                            <label class="form-label">Введите текст для анализа:</label>
-                            <textarea
-                                class="form-control"
-                                rows="4"
-                                placeholder="Пример: 'Сегодня отличная погода для прогулки в парке'"
-                            ></textarea>
+                            {{ ml_form.text.label(class="form-label") }}
+                            {{ ml_form.text(class="form-control", rows=4) }}
+                            {% for error in ml_form.text.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Выберите модель:</label>
-                            <select class="form-select">
-                                <option>Тональность текста</option>
-                                <option>Классификация тем</option>
-                                <option>Извлечение сущностей</option>
-                            </select>
+                            {{ ml_form.model_type.label(class="form-label") }}
+                            {{ ml_form.model_type(class="form-select") }}
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-magic"></i> Анализировать
+                            <i class="bi bi-magic me-2"></i>Анализировать
                         </button>
                     </form>
 
-                    <div class="mt-4 p-3 bg-light rounded-3 d-none" id="ml-result">
-                        <h5>Результат анализа:</h5>
-                        <div class="mt-2" id="result-content"></div>
+                    {% if ml_result %}
+                    <div class="mt-4 p-3 bg-light rounded-3">
+                        <h5 class="mb-3">Результат анализа:</h5>
+                        <div class="mt-2">
+                            {% if ml_result.error %}
+                                <div class="alert alert-danger">{{ ml_result.error }}</div>
+                            {% else %}
+                                <div class="alert alert-success">
+                                    <strong>Тональность:</strong> {{ ml_result.sentiment }}<br>
+                                    <strong>Уверенность:</strong> {{ "%.1f"|format(ml_result.confidence * 100) }}%
+                                </div>
+                                {% if ml_result.keywords %}
+                                <div class="mt-3">
+                                    <strong class="d-block mb-2">Ключевые слова:</strong>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% for word in ml_result.keywords %}
+                                        <span class="badge bg-info">{{ word }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -47,7 +67,7 @@
         <!-- Новостная лента -->
         <div class="col-12 col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="display-6 fw-bold">Записи в блоге</h1>
+                <h1 class="display-6 fw-bold">Новости AdapStory</h1>
                 {% if current_user.is_authenticated %}
                     <a href="news" class="btn btn-primary rounded-pill px-4">
                         <i class="bi bi-plus-lg me-2"></i>Добавить новость
@@ -58,11 +78,47 @@
             <div class="news-feed">
                 {% for item in news %}
                 <div class="card news-item mb-4 shadow-sm">
-                    <!-- ... существующая верстка новостей ... -->
+                    <div class="card-body">
+                        {% if item.is_private %}
+                        <span class="badge bg-warning text-dark mb-2">
+                            <i class="bi bi-lock-fill me-1"></i>Приватная запись
+                        </span>
+                        {% endif %}
+
+                        <h2 class="card-title mb-3 fw-bold">{{ item.title }}</h2>
+
+                        <div class="card-text mb-4 text-muted">
+                            {{ item.content }}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted small">
+                                <i class="bi bi-person-circle me-1"></i>{{ item.user.name }}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-clock me-1"></i>
+                                {{ item.created_date.strftime('%d.%m.%Y %H:%M') }}
+                            </div>
+
+                            {% if current_user.is_authenticated and current_user == item.user %}
+                            <div class="btn-group">
+                                <a href="/news/{{ item.id }}" class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil-square me-2"></i>Изменить
+                                </a>
+                                <a href="/news_delete/{{ item.id }}" class="btn btn-outline-danger btn-sm ms-2">
+                                    <i class="bi bi-trash3 me-2"></i>Удалить
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
                 {% else %}
                 <div class="card border-dashed">
-                    <!-- ... существующая верстка пустого состояния ... -->
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-newspaper display-1 text-muted mb-4"></i>
+                        <h3 class="text-muted mb-3">Пока нет новостей</h3>
+                        <p class="text-muted">Станьте первым автором!</p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -74,6 +130,7 @@
     .sticky-top {
         position: -webkit-sticky;
         position: sticky;
+        top: 20px;
         z-index: 1000;
     }
 
@@ -83,11 +140,17 @@
     }
 
     .news-item {
-        transition: transform 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .news-item:hover {
-        transform: translateX(10px);
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+
+    .border-dashed {
+        border: 2px dashed #dee2e6;
+        border-radius: 1rem;
     }
 
     @media (max-width: 992px) {

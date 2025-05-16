@@ -1,2 +1,6 @@
 python-dotenv
 flask-wtf
+joblib
+flask
+flask-restful
+scikit-learn
