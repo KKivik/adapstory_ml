@@ -13,17 +13,16 @@ from flask_login import current_user
 from forms.user import LoginForm
 from ML.classification_comments.classification_comments import ML_classification_comments
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-analyzer = ML_classification_comments
+analyzer = ML_classification_comments()
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+    return db_sess.get(User, user_id)  # Исправлено с query().get() на get()
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -67,22 +66,25 @@ def login():
 def first_page():
     return render_template('first_page.html', title='Главная страница')
 
-@app.route("/main")
+@app.route("/main", methods=['GET', 'POST'])
 def main_page():
     db_sess = db_session.create_session()
     news = db_sess.query(News).filter((News.is_private != True) | ((News.is_private == True) & (News.user_id == current_user.id)))
     # Создаем форму для ML
     ml_form = MLForm()
-    result = None
+    ml_result = None
 
     # Обрабатываем отправку формы
     if ml_form.validate_on_submit():
-        text = ml_form.text.data
-        model_type = ml_form.model_type.data
-        # Вызываем ML-модель
-        result = analyzer.predict(text)
+        try:
+            text = ml_form.text.data
+            model_type = ml_form.model_type.data
+            # Вызываем ML-модель
+            ml_result = analyzer.predict(text)
+        except Exception as e:
+            ml_result = {"error": f"Ошибка анализа: {str(e)}"}
 
-    return render_template("index3.html", news=news, ml_form=ml_form)
+    return render_template("index3.html", news=news, ml_form=ml_form, ml_result=ml_result)
 
 
 @app.route('/logout')
@@ -159,7 +161,7 @@ def news_delete(id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
 
 
 if __name__ == '__main__':
