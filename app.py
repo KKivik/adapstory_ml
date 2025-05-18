@@ -13,11 +13,19 @@ from flask_login import current_user
 from forms.user import LoginForm
 from ML.classification_comments.classification_comments import ML_classification_comments
 
+from flask_restful import reqparse, abort, Api, Resource
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-analyzer = ML_classification_comments()
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+api = Api(app)
+
+analyzer = ML_classification_comments()
+
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -161,7 +169,7 @@ def news_delete(id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    app.run(host='0.0.0.0', port=5000)
+    app.run()
 
 
 if __name__ == '__main__':

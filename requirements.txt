@@ -4,3 +4,7 @@ joblib
 flask
 flask-restful
 scikit-learn
+nltk
+pandas
+psycopg2-binary
+sqlalchemy-serializer
