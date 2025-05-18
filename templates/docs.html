@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Документация{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Документация API</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Метод</th>
+                    <th scope="col">Эндпоинт</th>
+                    <th scope="col">Описание</th>
+                    <th scope="col">Параметры</th>
+                    <th scope="col">Пример</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td><span class="badge badge-primary">GET</span></td>
+                    <td><code>/api/users</code></td>
+                    <td>Получить список пользователей</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li><strong>limit</strong>: количество пользователей (по умолчанию 10)</li>
+                            <li><strong>offset</strong>: смещение (по умолчанию 0)</li>
+                        </ul>
+                    </td>
+                    <td><code>/api/users?limit=5&offset=10</code></td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td><span class="badge badge-success">POST</span></td>
+                    <td><code>/api/users</code></td>
+                    <td>Создать нового пользователя</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li><strong>username</strong>: имя пользователя (обязательно)</li>
+                            <li><strong>email</strong>: email (обязательно)</li>
+                            <li><strong>password</strong>: пароль (обязательно)</li>
+                        </ul>
+                    </td>
+                    <td><code>{ "username": "test", "email": "test@example.com", "password": "secret" }</code></td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td><span class="badge badge-info">GET</span></td>
+                    <td><code>/api/users/{id}</code></td>
+                    <td>Получить информацию о пользователе</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong>: ID пользователя (обязательно)</li>
+                        </ul>
+                    </td>
+                    <td><code>/api/users/42</code></td>
+                </tr>
+                <tr>
+                    <th scope="row">4</th>
+                    <td><span class="badge badge-warning">PUT</span></td>
+                    <td><code>/api/users/{id}</code></td>
+                    <td>Обновить информацию о пользователе</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong>: ID пользователя (обязательно)</li>
+                            <li><strong>username</strong>: новое имя пользователя</li>
+                            <li><strong>email</strong>: новый email</li>
+                        </ul>
+                    </td>
+                    <td><code>{ "username": "newname", "email": "new@example.com" }</code></td>
+                </tr>
+                <tr>
+                    <th scope="row">5</th>
+                    <td><span class="badge badge-danger">DELETE</span></td>
+                    <td><code>/api/users/{id}</code></td>
+                    <td>Удалить пользователя</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong>: ID пользователя (обязательно)</li>
+                        </ul>
+                    </td>
+                    <td><code>/api/users/42</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <h5 class="alert-heading">Примечания</h5>
+        <ul>
+            <li>Все запросы к API требуют аутентификации (кроме публичных эндпоинтов)</li>
+            <li>Ответы возвращаются в формате JSON</li>
+            <li>Базовый URL: <code>https://api.example.com/v1</code></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -16,7 +16,7 @@ from ML.classification_comments.classification_comments import ML_classification
 from flask_restful import reqparse, abort, Api, Resource
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = 'ML_AdapStory1242'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -94,6 +94,10 @@ def main_page():
 
     return render_template("index3.html", news=news, ml_form=ml_form, ml_result=ml_result)
 
+
+@app.route('/docs')
+def show_docs():
+    return render_template("docs2.html")
 
 @app.route('/logout')
 @login_required
