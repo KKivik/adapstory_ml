@@ -4,7 +4,13 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Документация API (POST-запросы)</h1>
+    <!-- Кнопка "Назад" в верхнем правом углу -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Документация API (POST-запросы)</h1>
+        <a href="/main" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+    </div>
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
@@ -41,5 +47,26 @@
             <li>Ответы возвращаются в формате JSON</li>
         </ul>
     </div>
+
+    <!-- Дублирующая кнопка "Назад" внизу страницы -->
+    <div class="text-center mt-4">
+        <a href="/main" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Вернуться на главную
+        </a>
+    </div>
 </div>
+
+<!-- Подключаем Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+    .badge-success {
+        background-color: #28a745;
+        color: white;
+    }
+    .thead-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>
 {% endblock %}

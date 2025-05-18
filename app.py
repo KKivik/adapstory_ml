@@ -11,7 +11,8 @@ from flask import redirect, make_response, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_login import current_user
 from forms.user import LoginForm
-from ML.classification_comments.classification_comments import ML_classification_comments
+from ML.classification_comments.classification_comments import analyzer
+
 
 from flask_restful import reqparse, abort, Api, Resource
 import ml_resourses
@@ -28,13 +29,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 api = Api(app)
-api.add_resource(ml_resourses.TokenResource, '/api/token')
 
-# для одного объекта
 api.add_resource(ml_resourses.Verify, '/api/verify')
-
-
-analyzer = ML_classification_comments()
+api.add_resource(ml_resourses.ML_cl_LogReg_and_TF_IDF, '/api/predict')
 
 
 @login_manager.user_loader

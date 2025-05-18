@@ -53,6 +53,9 @@ class ML_classification_comments:
                 lemmas.append(word)
         return ' '.join(lemmas)
 
+
+analyzer = ML_classification_comments()
+
 if __name__ == '__main__':
     os.chdir("..")
     os.chdir("..")
