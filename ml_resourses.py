@@ -28,6 +28,7 @@ class ML_cl_LogReg_and_TF_IDF(Resource):
 
         token = args['api_key']
         print(token)
+        print(os.getenv('SECRET_KEY'))
         s = Serializer(os.getenv('SECRET_KEY'))
         try:
             data = s.loads(token)
