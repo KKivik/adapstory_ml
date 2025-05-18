@@ -14,17 +14,27 @@ from forms.user import LoginForm
 from ML.classification_comments.classification_comments import ML_classification_comments
 
 from flask_restful import reqparse, abort, Api, Resource
+import ml_resourses
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ML_AdapStory1242'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 api = Api(app)
+api.add_resource(ml_resourses.TokenResource, '/api/token')
+
+# для одного объекта
+api.add_resource(ml_resourses.Verify, '/api/verify')
+
 
 analyzer = ML_classification_comments()
-
 
 
 @login_manager.user_loader
@@ -92,7 +102,9 @@ def main_page():
         except Exception as e:
             ml_result = {"error": f"Ошибка анализа: {str(e)}"}
 
-    return render_template("index3.html", news=news, ml_form=ml_form, ml_result=ml_result)
+    return render_template("index4.html", news=news, ml_form=ml_form, ml_result=ml_result)
+
+
 
 
 @app.route('/docs')

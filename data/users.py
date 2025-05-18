@@ -5,6 +5,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import orm
 from sqlalchemy_serializer import SerializerMixin
+from itsdangerous import URLSafeTimedSerializer as Serializer
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
@@ -25,3 +31,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def generate_auth_token(self, expiration=3600):
+        s = Serializer(os.getenv('SECRET_KEY'))
+        return s.dumps({'id': self.id})
+
