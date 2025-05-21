@@ -22,16 +22,13 @@ class ML_classification_comments:
         print(self.classifier.predict(self.tfidf_vectorizer.transform([self.smart_lemmatize_and_remove_stopwords('Мне не понравился')])))
 
     def predict(self, text):
-        print(text)
         str_of_word = self.smart_lemmatize_and_remove_stopwords(text)
-        print(str_of_word)
         tfidf_features = self.tfidf_vectorizer.transform([str_of_word])
 
         lst_of_word = str_of_word.split()
         # Предсказание с помощью модели
-
         prediction = self.classifier.predict(tfidf_features)
-        print(prediction)
+
 
         confidence = self.classifier.predict_proba(tfidf_features).tolist()[0]
         weights = pd.DataFrame({'words': self.tfidf_vectorizer.get_feature_names_out(),

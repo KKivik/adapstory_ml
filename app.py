@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify
 from sqlalchemy.sql.functions import current_user
+from waitress import serve
 
 from data import db_session
 from forms.user import RegisterForm
@@ -182,7 +183,9 @@ def news_delete(id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    #app.run(host='0.0.0.0', port=port)
+    serve(app, host='0.0.0.0', port=port)
 
 
 if __name__ == '__main__':
