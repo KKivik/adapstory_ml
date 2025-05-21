@@ -14,18 +14,26 @@ class ML_classification_comments:
         # Загрузка TF-IDF векторайзера
         self.tfidf_vectorizer = joblib.load('ML/classification_comments/tfidf_vectorizer.pkl')
         # Загрузка модели классификации
-        self.classifier = joblib.load('ML/classification_comments/model_4_TF-IDFandLogReg.pkl')
+        self.classifier = joblib.load('ML/classification_comments/model_6_TF-IDFandLogReg.pkl')
 
         self.morph = MorphAnalyzer()
         self.russian_stopwords = set(stopwords.words('russian')) - {'не'}  # Исключаем "не" из стоп-слов
 
+        print(self.classifier.predict(self.tfidf_vectorizer.transform([self.smart_lemmatize_and_remove_stopwords('Мне не понравился')])))
+
     def predict(self, text):
+        print(text)
         str_of_word = self.smart_lemmatize_and_remove_stopwords(text)
-        self.tfidf_features = self.tfidf_vectorizer.transform([str_of_word])
+        print(str_of_word)
+        tfidf_features = self.tfidf_vectorizer.transform([str_of_word])
+
         lst_of_word = str_of_word.split()
         # Предсказание с помощью модели
-        self.prediction = self.classifier.predict(self.tfidf_features)
-        self.confidence = self.classifier.predict_proba(self.tfidf_features).tolist()[0]
+
+        prediction = self.classifier.predict(tfidf_features)
+        print(prediction)
+
+        confidence = self.classifier.predict_proba(tfidf_features).tolist()[0]
         weights = pd.DataFrame({'words': self.tfidf_vectorizer.get_feature_names_out(),
                                 'weights': self.classifier.coef_.flatten()})
 
@@ -36,9 +44,9 @@ class ML_classification_comments:
         weights_max = weights_filtered.sort_values(by='weights', ascending=False).head(3)['words'].tolist()
 
         return {
-            "sentiment": "Плохой" if self.prediction else "Хороший",  # Тональность
-            "confidence": self.confidence[1] if self.prediction else self.confidence[0],
-            "keywords": weights_min if self.prediction else weights_max
+            "sentiment": "Плохой" if prediction else "Хороший",  # Тональность
+            "confidence": confidence[1] if prediction else confidence[0],
+            "keywords": weights_min if prediction else weights_max
         }
 
     def smart_lemmatize_and_remove_stopwords(self, text):
