@@ -52,7 +52,6 @@
         </div>
     </div>
 
-
     <div class="row g-4">
         <!-- Блок ML-сервиса -->
         <div class="col-12 col-lg-4">
@@ -76,7 +75,12 @@
 
                         <div class="mb-3">
                             {{ ml_form.model_type.label(class="form-label") }}
-                            {{ ml_form.model_type(class="form-select") }}
+                            {{ ml_form.model_type(class="form-select", id="modelTypeSelect") }}
+                        </div>
+
+                        <div class="mb-3" id="modelNumContainer" style="display: none;">
+                            {{ ml_form.model_num.label(class="form-label") }}
+                            {{ ml_form.model_num(class="form-select", id="modelNumSelect") }}
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
@@ -191,6 +195,28 @@ document.getElementById('copyTokenBtn').addEventListener('click', function() {
         this.innerHTML = originalText;
     }, 2000);
 });
+
+// Функция для управления видимостью поля выбора типа модели
+function toggleModelNumVisibility() {
+    const modelTypeSelect = document.getElementById('modelTypeSelect');
+    const modelNumContainer = document.getElementById('modelNumContainer');
+
+    // Показываем поле выбора типа модели только если выбрана модель
+    if (modelTypeSelect.value && modelTypeSelect.value !== '') {
+        modelNumContainer.style.display = 'block';
+    } else {
+        modelNumContainer.style.display = 'none';
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Назначаем обработчик события change
+    document.getElementById('modelTypeSelect').addEventListener('change', toggleModelNumVisibility);
+
+    // Вызываем функцию сразу при загрузке
+    toggleModelNumVisibility();
+});
 </script>
 
 <style>
@@ -200,6 +226,21 @@ document.getElementById('copyTokenBtn').addEventListener('click', function() {
         top: 20px;
         z-index: 1000;
     }
-    /* ... остальные стили ... */
+
+    .news-item {
+        transition: transform 0.2s ease;
+    }
+
+    .news-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .border-dashed {
+        border: 2px dashed #dee2e6;
+    }
+
+    #modelNumContainer {
+        transition: all 0.3s ease;
+    }
 </style>
 {% endblock %}
