@@ -34,5 +34,57 @@
 <main role="main" class="container">
     {% block content %}{% endblock %}
 </main>
+
+<!-- Подключаем Bootstrap JS для модальных окон -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Функция для копирования токена в буфер обмена
+document.getElementById('copyTokenBtn').addEventListener('click', function() {
+    const tokenInput = document.getElementById('apiTokenInput');
+    tokenInput.select();
+    document.execCommand('copy');
+
+    // Визуальная обратная связь
+    const originalText = this.innerHTML;
+    this.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+    setTimeout(() => {
+        this.innerHTML = originalText;
+    }, 2000);
+});
+
+// Обработчик для показа/скрытия поля выбора модели
+document.addEventListener('DOMContentLoaded', function() {
+    const modelTypeSelect = document.querySelector('select[name="model_type"]');
+    const modelNumContainer = document.getElementById('modelNumContainer');
+
+    function toggleModelNumVisibility() {
+        if (modelTypeSelect.value) {
+            modelNumContainer.style.display = 'block';
+        } else {
+            modelNumContainer.style.display = 'none';
+        }
+    }
+
+    // Инициализация при загрузке страницы
+    toggleModelNumVisibility();
+
+    // Обработчик изменения значения
+    modelTypeSelect.addEventListener('change', toggleModelNumVisibility);
+});
+</script>
+
+<style>
+    .sticky-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 20px;
+        z-index: 1000;
+    }
+    
+    #modelNumContainer {
+        transition: all 0.3s ease-in-out;
+    }
+    /* ... остальные стили ... */
+</style>
 </body>
 </html>

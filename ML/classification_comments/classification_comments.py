@@ -21,7 +21,7 @@ class ML_classification_comments:
 
         print(self.classifier.predict(self.tfidf_vectorizer.transform([self.smart_lemmatize_and_remove_stopwords('Мне не понравился')])))
 
-    def predict(self, text):
+    def predict_logreg_tfidf(self, text):
         str_of_word = self.smart_lemmatize_and_remove_stopwords(text)
         tfidf_features = self.tfidf_vectorizer.transform([str_of_word])
 

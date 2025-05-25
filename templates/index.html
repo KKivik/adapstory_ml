@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
 <h1>Записи в блоге</h1>
 {% if current_user.is_authenticated %}
     <a href="news" class="btn btn-secondary">Добавить новость</a>
@@ -26,4 +29,80 @@
     </div>
 </div>
 {% endfor %}
+
+<form method="POST">
+    {{ ml_form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ ml_form.text.label(class="form-label") }}
+        {{ ml_form.text(class="form-control", rows=4) }}
+        {% for error in ml_form.text.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ ml_form.model_type.label(class="form-label") }}
+        {{ ml_form.model_type(class="form-select") }}
+    </div>
+
+    <div class="mb-3" id="modelNumContainer" style="display: none;">
+        {{ ml_form.model_num.label(class="form-label") }}
+        {{ ml_form.model_num(class="form-select") }}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-magic me-2"></i>Анализировать
+    </button>
+</form>
+
+<!-- Подключаем Bootstrap JS для модальных окон -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Копирование токена
+document.getElementById('copyTokenBtn')?.addEventListener('click', function() {
+    const tokenInput = document.getElementById('apiTokenInput');
+    tokenInput.select();
+    document.execCommand('copy');
+
+    const originalText = this.innerHTML;
+    this.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+    setTimeout(() => {
+        this.innerHTML = originalText;
+    }, 2000);
+});
+
+// Обработчик для показа/скрытия поля выбора модели
+document.addEventListener('DOMContentLoaded', function() {
+    const modelTypeSelect = document.querySelector('select[name="model_type"]');
+    const modelNumContainer = document.getElementById('modelNumContainer');
+
+    function toggleModelNumVisibility() {
+        if (modelTypeSelect.value) {
+            modelNumContainer.style.display = 'block';
+        } else {
+            modelNumContainer.style.display = 'none';
+        }
+    }
+
+    // Инициализация при загрузке страницы
+    toggleModelNumVisibility();
+
+    // Обработчик изменения значения
+    modelTypeSelect.addEventListener('change', toggleModelNumVisibility);
+});
+</script>
+
+<style>
+    .sticky-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 20px;
+        z-index: 1000;
+    }
+    
+    #modelNumContainer {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
 {% endblock %}

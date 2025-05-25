@@ -96,7 +96,9 @@ def main_page():
             text = ml_form.text.data
             model_type = ml_form.model_type.data
             # Вызываем ML-модель
-            ml_result = analyzer.predict(text)
+            if model_type == 'Тональность текста':
+                if ml_form.model_num.data == 'Logistic Regression + TF-IDF':
+                    ml_result = analyzer.predict_logreg_tfidf(text)
         except Exception as e:
             ml_result = {"error": f"Ошибка анализа: {str(e)}"}
 
