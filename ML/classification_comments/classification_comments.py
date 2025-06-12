@@ -5,21 +5,36 @@ import nltk
 import re
 from pymorphy3 import MorphAnalyzer
 from nltk.corpus import stopwords
-
-
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
+import torch
+from pathlib import Path
 
 class ML_classification_comments:
     def __init__(self):
         nltk.download('stopwords')
         # Загрузка TF-IDF векторайзера
-        self.tfidf_vectorizer = joblib.load('ML/classification_comments/tfidf_vectorizer.pkl')
+        base_dir = Path(__file__).parent.parent.parent  # Поднимаемся на два уровня вверх от текущего файла
+
+        tfidf_path = base_dir / 'ML' / 'classification_comments' / 'LogRegandTF-IDF' / 'tfidf_vectorizer.pkl'
+        model_path = base_dir / 'ML' / 'classification_comments' / 'LogRegandTF-IDF' / 'model_6_TF-IDFandLogReg.pkl'
+        self.tfidf_vectorizer = joblib.load(tfidf_path)
         # Загрузка модели классификации
-        self.classifier = joblib.load('ML/classification_comments/model_6_TF-IDFandLogReg.pkl')
+        self.classifier = joblib.load(model_path)
 
         self.morph = MorphAnalyzer()
         self.russian_stopwords = set(stopwords.words('russian')) - {'не'}  # Исключаем "не" из стоп-слов
 
-        print(self.classifier.predict(self.tfidf_vectorizer.transform([self.smart_lemmatize_and_remove_stopwords('Мне не понравился')])))
+        tokenyzer_path = base_dir / 'ML' / 'classification_comments' / 'tune_RuElectra'
+        model_ruelectra_path = base_dir / 'ML' / 'classification_comments' / 'tune_RuElectra' / 'model.safetensors'
+
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenyzer_path)
+        self.model_tune_ruelectra = AutoModelForSequenceClassification.from_pretrained(tokenyzer_path)
+        self.classifier_ruelectra = pipeline(
+            "text-classification",
+            model=self.model_tune_ruelectra,
+            tokenizer=self.tokenizer,
+            device=0 if torch.cuda.is_available() else -1
+        )
 
     def predict_logreg_tfidf(self, text):
         str_of_word = self.smart_lemmatize_and_remove_stopwords(text)
@@ -46,6 +61,13 @@ class ML_classification_comments:
             "keywords": weights_min if prediction else weights_max
         }
 
+    def predict_tune_ruelectra(self, text):
+        results = self.classifier_ruelectra(text)[0]
+        return {
+            "sentiment": "Плохой" if results['label'] == "LABEL_1" else "Хороший",  # Тональность
+            "confidence": results['score'],
+        }
+
     def smart_lemmatize_and_remove_stopwords(self, text):
         if not isinstance(text, str):  # Если не строка (на всякий случай)
             return str(text)
@@ -59,15 +81,11 @@ class ML_classification_comments:
         return ' '.join(lemmas)
 
 
-analyzer = ML_classification_comments()
+#analyzer = ML_classification_comments()
 
 if __name__ == '__main__':
     os.chdir("..")
     os.chdir("..")
     print(os.getcwd())
     model = ML_classification_comments()
-    print(model.predict('Ужасный курс'))
-    print(model.predict('Плохой курс'))
-    print(model.predict('ахуенчик'))
-    print(model.predict('Мне очень понравилось'))
-    print(model.predict('Очень хорошо'))
+    print(model.predict_tune_ruelectra('Ужасный курс'))
